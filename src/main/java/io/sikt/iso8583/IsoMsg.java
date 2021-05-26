@@ -27,7 +27,7 @@ public class IsoMsg {
     @Getter
     private String isoHeader; //Optional
 
-    private final Map<Integer, FieldValue> fields = new TreeMap<>();
+    private final Map<Integer, String> fields = new TreeMap<>();
 
     @Getter
     private final BitSet bitMap = new BitSet();
@@ -39,14 +39,19 @@ public class IsoMsg {
 
     @SneakyThrows
     public void setMTI(String mti) {
-        this.setField(0, FieldType.ALPHA.value(mti.getBytes(encoding)));
+        this.setField(0, mti);
     }
 
-    public FieldValue getField(int field) {
+    public String getField(int field) {
         return this.fields.get(field);
     }
 
-    public void setField(int field, FieldValue value) {
+    @SneakyThrows
+    public byte[] getFieldAsByteArray(int field) {
+        return this.fields.get(field).getBytes(encoding);
+    }
+
+    public void setField(int field, String value) {
         this.fields.put(field, value);
         recalculateBitMap();
     }
@@ -54,8 +59,8 @@ public class IsoMsg {
     private void recalculateBitMap() {
         bitMap.clear();
         fields.keySet().stream()
-                .filter(field -> field > 0)
-                .forEach(bitMap::set);
+            .filter(field -> field > 0)
+            .forEach(bitMap::set);
     }
 
     public byte[] pack() {

@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public enum FieldType {
+    BITMAP, // TODO
     NUMERIC,
     ALPHA,
     BINARY,
@@ -14,6 +15,8 @@ public enum FieldType {
     LLLBIN,
     LLLLVAR,
     LLLLBIN;
+
+    private final int length = 0;
 
     public static final Set<FieldType> VARIABLE_LENGTH_TYPES = Collections.unmodifiableSet(EnumSet.of(LLBIN, LLLBIN, LLLLBIN, LLVAR, LLLVAR, LLLLVAR));
     public static final Set<FieldType> BINARY_TYPE = Collections.unmodifiableSet(EnumSet.of(BINARY, LLBIN, LLLBIN, LLLLBIN));

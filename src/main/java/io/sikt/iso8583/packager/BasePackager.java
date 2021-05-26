@@ -1,8 +1,8 @@
 package io.sikt.iso8583.packager;
 
 import io.sikt.iso8583.FieldType;
-import io.sikt.iso8583.FieldValue;
 import io.sikt.iso8583.IsoMsg;
+import io.sikt.iso8583.packager.fields.PackagerField;
 import io.sikt.iso8583.util.ByteArrayUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -10,9 +10,19 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.Map;
 
 @Slf4j
 public abstract class BasePackager implements MessagePackager {
+
+    private final Map<String, Map<Integer, PackagerField>> messageTypePackagerMap = buildMessagePackagers();
+
+    abstract Map<String, Map<Integer, PackagerField>> buildMessagePackagers();
+
+
+//    void setFieldPackagers(Map<Integer, GenericFieldPackager> fieldPackagers) {
+//        this.fieldPackagers = buildFieldPackagers();
+//    }
 
     @SneakyThrows
     @Override
@@ -20,8 +30,16 @@ public abstract class BasePackager implements MessagePackager {
 
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
+        final String mti = msg.getField(0);
+        if (mti == null)
+            throw new RuntimeException("Unable to determine field parsing because field 0 is not set. ");
+
+        final Map<Integer, PackagerField> fieldParserGuide = messageTypePackagerMap.get(mti);
+
+        validatePackagerField(mti, fieldParserGuide, 0);
+
         //First MTI
-        writeToBuffer(bout, msg.getField(0));
+        writeToBuffer(bout, msg.getFieldAsByteArray(0), fieldParserGuide.get(0).getType());
 
         final BitSet bs = msg.getBitMap();
 
@@ -30,9 +48,25 @@ public abstract class BasePackager implements MessagePackager {
         if (msg.getIsoHeader() != null)
             bout.write(msg.getIsoHeader().getBytes(msg.getEncoding()));
 
-        bs.stream().forEach(field -> writeToBuffer(bout, msg.getField(field)));
+        bs.stream().forEach(field -> {
+            validatePackagerField(mti, fieldParserGuide, field);
+
+            printToBuffer(msg, bout, fieldParserGuide.get(field), field);
+
+//            writeToBuffer(bout, msg.getFieldAsByteArray(field), fieldParserGuide[field].getType());
+        });
 
         return bout.toByteArray();
+    }
+
+    private void validatePackagerField(String mti, Map<Integer, PackagerField> fieldParserGuide, int field) {
+        if (!fieldParserGuide.containsKey(field))
+            throw new RuntimeException("Field " + field + " does not exist in packager for type " + mti + "!");
+    }
+
+    @SneakyThrows
+    private void printToBuffer(IsoMsg msg, ByteArrayOutputStream bout, PackagerField packagerField, int field) {
+        bout.write(packagerField.pack(msg.getField(field), msg.getEncoding()));
     }
 
     @SneakyThrows
@@ -46,28 +80,28 @@ public abstract class BasePackager implements MessagePackager {
 
     }
 
-    private void writeToBuffer(ByteArrayOutputStream bout, FieldValue value) {
-        if (value == null || value.getValue() == null)
+    private void writeToBuffer(ByteArrayOutputStream bout, byte[] value, FieldType fieldType) {
+        if (value == null)
             return;
         try {
-            switch (value.getType()) {
+            switch (fieldType) {
                 case BINARY:
-                    bout.write(ByteArrayUtil.byte2hex(value.getValue()).getBytes());
+                    bout.write(ByteArrayUtil.byte2hex(value).getBytes());
                     break;
 
                 case ALPHA:
                 case NUMERIC:
-                    bout.write(value.getValue());
+                    bout.write(value);
                     break;
 
                 default:
-                    final boolean isBinary = FieldType.isBinaryType(value.getType());
-                    if (FieldType.isVariableLength(value.getType()))
+                    final boolean isBinary = FieldType.isBinaryType(fieldType);
+                    if (FieldType.isVariableLength(fieldType))
                         writeLengthHeader(bout,
-                                isBinary ? value.getValue().length : value.getValue().length / 2,
-                                value.getType());
+                            isBinary ? value.length : value.length / 2,
+                            fieldType);
 
-                    bout.write(isBinary ? ByteArrayUtil.byte2hex(value.getValue()).getBytes() : value.getValue());
+                    bout.write(isBinary ? ByteArrayUtil.byte2hex(value).getBytes() : value);
             }
         } catch (IOException ex) {
             log.error("Failed to write field to buffer..", ex);

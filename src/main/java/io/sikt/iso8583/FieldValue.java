@@ -16,8 +16,6 @@ public class FieldValue {
     }
 
 
-
-
 //    public String getStringValue() {
 //        switch (type) {
 //            case BINARY:
