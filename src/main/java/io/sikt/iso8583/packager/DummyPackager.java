@@ -6,7 +6,8 @@ import io.sikt.iso8583.packager.fields.NUMERIC;
 import io.sikt.iso8583.packager.fields.PackagerField;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -14,9 +15,12 @@ import java.util.stream.Stream;
 @Slf4j
 public class DummyPackager extends BasePackager {
 
+    public DummyPackager() {
+        super(buildPackagerConfiguration());
+    }
 
-    private Map<Integer, PackagerField> build1820() {
-        return Stream.of(new Object[][]{
+    static PackagerConfiguration buildPackagerConfiguration() {
+        Map<Integer, PackagerField> packagerInfo = Stream.of(new Object[][]{
             {0, new NUMERIC(4, "MTI")},
             {7, new ALPHA(10, "DATE")},
             {11, new NUMERIC(6, "Systems trace audit number")},
@@ -28,24 +32,10 @@ public class DummyPackager extends BasePackager {
             {64, new ALPHA(8, "MAC")}
         }).collect(Collectors.toMap(data -> (Integer) data[0], data -> (PackagerField) data[1]));
 
-//        return new PackagerField[]{
-//            /* 000 */new NUMERIC(4, "MTI"),
-//            /* 001 */new NUMERIC(20, "Dummy field 0"),
-//            /* 002 */new NUMERIC(20, "Dummy field 0"),
-//            /* 003 */new ALPHA(20, "Dummy field 0"),
-//            /* 004 */new ALPHA(20, "Dummy field 0"),
-//            /* 005 */new ALPHA(20, "Dummy field 0"),
-//            /* 006 */new ALPHA(20, "Dummy field 0")
-//        };
-    }
+        PackagerConfiguration configuration = new PackagerConfiguration();
+        configuration.setPackagerInfo(packagerInfo);
+        configuration.setMessageTypeParserGuide(Collections.singletonMap("1820", new ArrayList<>(packagerInfo.keySet())));
 
-    @Override
-    Map<String, Map<Integer, PackagerField>> buildMessagePackagers() {
-        Map<String, Map<Integer, PackagerField>> packagerMap = new HashMap<>();
-
-        packagerMap.put("1820", build1820());
-
-
-        return packagerMap;
+        return configuration;
     }
 }

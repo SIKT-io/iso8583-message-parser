@@ -10,14 +10,20 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 public abstract class BasePackager implements MessagePackager {
 
-    private final Map<String, Map<Integer, PackagerField>> messageTypePackagerMap = buildMessagePackagers();
+    final Map<Integer, PackagerField> packagerInfo;
+    final Map<String, List<Integer>> messageTypeParserGuide;
 
-    abstract Map<String, Map<Integer, PackagerField>> buildMessagePackagers();
+    public BasePackager(PackagerConfiguration packagerConfiguration) {
+        this.packagerInfo = packagerConfiguration.getPackagerInfo();
+        this.messageTypeParserGuide = packagerConfiguration.getMessageTypeParserGuide();
+    }
 
 
 //    void setFieldPackagers(Map<Integer, GenericFieldPackager> fieldPackagers) {
@@ -34,7 +40,11 @@ public abstract class BasePackager implements MessagePackager {
         if (mti == null)
             throw new RuntimeException("Unable to determine field parsing because field 0 is not set. ");
 
-        final Map<Integer, PackagerField> fieldParserGuide = messageTypePackagerMap.get(mti);
+        final List<Integer> expectedFields = messageTypeParserGuide.get(mti);
+
+        final Map<Integer, PackagerField> fieldParserGuide = packagerInfo.entrySet().stream()
+            .filter(entry -> expectedFields.contains(entry.getKey()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         validatePackagerField(mti, fieldParserGuide, 0);
 

@@ -9,10 +9,10 @@ import java.io.ByteArrayOutputStream;
 
 public abstract class GenericPackagerField implements PackagerField {
 
-    private int length;
-    private String description;
-    private Padding padding;
-    private FieldType type;
+    private final int length;
+    private final String description;
+    private final Padding padding;
+    private final FieldType type;
 
     public GenericPackagerField(int length, String description, FieldType fieldType, Padding padding) {
         this.length = length;
@@ -97,5 +97,15 @@ public abstract class GenericPackagerField implements PackagerField {
     @Override
     public Padding getPadding() {
         return padding;
+    }
+
+    @Override
+    public String toString() {
+        return "GenericPackagerField{" +
+            "length=" + length +
+            ", description='" + description + '\'' +
+            ", padding=" + padding.getClass().getSimpleName() +
+            ", type=" + type +
+            '}';
     }
 }

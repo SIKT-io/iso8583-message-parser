@@ -1,6 +1,7 @@
 package io.sikt.iso8583;
 
 import io.sikt.iso8583.packager.DummyPackager;
+import io.sikt.iso8583.packager.GenericPackager;
 import io.sikt.iso8583.util.ByteArrayUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,31 @@ import org.junit.jupiter.api.Test;
 public class MessageParserTest {
 
     @Test
-    void networkMgmtPackagerTest() {
+    void networkMgmtPackagerTest_genericPackager() {
+        final String expected = "3138323002300101000000003130323431303336303030313030303131373130323431303336303038333130353130353234";
+        IsoMsg msg = new IsoMsg();
+        msg.setPackager(new GenericPackager("src/main/resources/packagers/IFSF-ASCII-1993.json"));
+        msg.setBinBitmap(true);
+        msg.setMTI("1820");
+
+        msg.setField(7, "1024103600");
+        msg.setField(11, "010001");
+        msg.setField(12, "171024103600");
+        msg.setField(24, "831");
+        msg.setField(32, "10524");
+
+        System.out.println(msg.getBitMap());
+
+        final byte[] packed = msg.pack();
+        final String hexed = ByteArrayUtil.byte2hex(packed);
+        System.out.println(new String(packed));
+        System.out.println(hexed);
+
+        Assertions.assertEquals(expected, hexed);
+    }
+
+    @Test
+    void networkMgmtPackagerTest_dummyPackager() {
 
         final String expected = "3138323002300101000000003130323431303336303030313030303131373130323431303336303038333130353130353234";
 

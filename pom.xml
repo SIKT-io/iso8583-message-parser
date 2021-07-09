@@ -16,9 +16,16 @@
         <junit-jupiter-api.version>5.7.2</junit-jupiter-api.version>
         <lombok.version>1.18.20</lombok.version>
         <slf4j-api.version>1.7.30</slf4j-api.version>
+        <nanojson.version>1.7</nanojson.version>
+        <logback.version>1.2.3</logback.version>
     </properties>
 
     <dependencies>
+        <dependency>
+        <groupId>com.grack</groupId>
+        <artifactId>nanojson</artifactId>
+        <version>${nanojson.version}</version>
+    </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -34,6 +41,12 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit-jupiter-api.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
