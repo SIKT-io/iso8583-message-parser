@@ -2,6 +2,7 @@ package io.sikt.iso8583.dto;
 
 import com.grack.nanojson.JsonParserException;
 import com.grack.nanojson.JsonReader;
+import io.sikt.iso8583.IsoException;
 import io.sikt.iso8583.packager.PackagerConfiguration;
 import io.sikt.iso8583.packager.fields.PackagerField;
 import lombok.AccessLevel;
@@ -56,7 +57,7 @@ public class JsonPackagerParser {
                 configuration.setPackagerInfo(readPackagerInfo(reader));
                 break;
             default:
-                throw new RuntimeException("Unexpected JSON element: " + reader.key());
+                throw new IsoException("Unexpected JSON element: " + reader.key());
         }
     }
 

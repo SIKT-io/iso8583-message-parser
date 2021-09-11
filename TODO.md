@@ -2,6 +2,7 @@
 
  - [ ] implement packager on MTI-level
  - [ ] add a message-packager-identifier field on message, to know which packager to use..
+ - [ ] create sample packagers
 
 # Nice to have
 

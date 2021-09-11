@@ -6,7 +6,7 @@ import io.sikt.iso8583.util.ByteArrayUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class MessageParserTest {
+class MessageParserTest {
 
     @Test
     void networkMgmtPackagerTest_genericPackager() {
@@ -43,7 +43,6 @@ public class MessageParserTest {
         msg.setMTI("1820");
 
         msg.setField(7, "1024103600");
-//        msg.setField(11, "1024103600");
         msg.setField(11, "010001");
         msg.setField(12, "171024103600");
         msg.setField(24, "831");

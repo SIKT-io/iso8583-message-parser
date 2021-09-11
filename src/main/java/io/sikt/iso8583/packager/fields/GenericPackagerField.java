@@ -26,7 +26,6 @@ public abstract class GenericPackagerField implements PackagerField {
 
         final boolean isBinary = FieldType.isBinaryType(type);
 
-
         if (isBinary) {
             what = ByteArrayUtil.byte2hex(what.getBytes(charset));
         }

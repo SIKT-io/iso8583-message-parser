@@ -1,5 +1,6 @@
 package io.sikt.iso8583.dto;
 
+import io.sikt.iso8583.IsoException;
 import io.sikt.iso8583.packager.fields.*;
 import lombok.Data;
 
@@ -32,7 +33,7 @@ public class JsonPackagerField {
             case "LLLL_BIN":
                 return new LLLL_BIN(length, description);
             default:
-                throw new RuntimeException("Unknown field type: " + type);
+                throw new IsoException("Unknown field type: " + type);
         }
     }
 }
