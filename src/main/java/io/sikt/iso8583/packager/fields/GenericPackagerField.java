@@ -23,15 +23,15 @@ public abstract class GenericPackagerField implements PackagerField {
     }
 
     @SneakyThrows
-    public byte[] pack(String what, String charset) {
+    public byte[] pack(String what, Charset charset) {
 
         final String padded = padding.pad(what, length);
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
         final boolean isBinary = FieldType.isBinaryType(type);
-        final byte[] paddedRaw = isBinary ? ByteArrayUtil.hex2byte(what, Charset.forName(charset)) : padded.getBytes(charset);
+        final byte[] paddedRaw = isBinary ? ByteArrayUtil.hex2byte(what, charset) : padded.getBytes(charset);
         if (FieldType.isVariableLength(type)) {
-            writeLengthHeader(bout, isBinary ? paddedRaw.length * 2 : paddedRaw.length);
+            writeLengthHeader(bout, paddedRaw.length);
         }
 
         bout.write(paddedRaw);
@@ -40,7 +40,7 @@ public abstract class GenericPackagerField implements PackagerField {
     }
 
     @SneakyThrows
-    public String unpack(byte[] what, String charset) {
+    public String unpack(byte[] what, Charset charset) {
 
         final boolean isBinary = FieldType.isBinaryType(type);
 

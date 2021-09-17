@@ -35,8 +35,4 @@ public enum FieldType {
     public static boolean isVariableLength(FieldType fieldType) {
         return VARIABLE_LENGTH_TYPES.contains(fieldType);
     }
-
-    public FieldValue value(byte[] value) {
-        return new FieldValue(this, value);
-    }
 }

@@ -34,6 +34,16 @@ public abstract class BasePackager implements MessagePackager {
     }
 
     @Override
+    public Charset getCharacterEncoding() {
+        return this.encoding;
+    }
+
+    @Override
+    public PackagerField getFieldPackager(int field) {
+        return packagerInfo.get(field);
+    }
+
+    @Override
     public IsoMsg unpack(byte[] data) {
 
         if (data.length < 4)
@@ -94,6 +104,8 @@ public abstract class BasePackager implements MessagePackager {
 
     private Map<Integer, PackagerField> getFieldsParserGuide(String mti) {
         final List<Integer> expectedFields = messageTypeParserGuide.get(mti);
+        if (expectedFields == null || expectedFields.isEmpty())
+            return packagerInfo;
 
         return packagerInfo.entrySet().stream()
             .filter(entry -> expectedFields.contains(entry.getKey()))
@@ -107,7 +119,8 @@ public abstract class BasePackager implements MessagePackager {
 
     @SneakyThrows
     private void printToBuffer(IsoMsg msg, ByteArrayOutputStream bout, PackagerField packagerField, int field) {
-        bout.write(packagerField.pack(msg.getField(field), encoding.name()));
+        if (packagerField == null || !msg.hasField(field)) return;
+        bout.write(packagerField.pack(msg.getField(field), encoding));
     }
 
     @SneakyThrows
@@ -144,6 +157,6 @@ public abstract class BasePackager implements MessagePackager {
         }
 
         final byte[] tmp = readChunk(what, offset, length);
-        return packagerField.unpack(tmp, encoding.name());
+        return packagerField.unpack(tmp, encoding);
     }
 }

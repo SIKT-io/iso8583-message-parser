@@ -3,7 +3,6 @@ package io.sikt.iso8583.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -72,74 +71,6 @@ public class ByteArrayUtil {
         }
     }
 
-    public static byte[] int2byte(int value) {
-        if (value < 0) {
-            return new byte[]{(byte) (value >>> 24 & 255), (byte) (value >>> 16 & 255), (byte) (value >>> 8 & 255), (byte) (value & 255)};
-        } else if (value <= 255) {
-            return new byte[]{(byte) (value & 255)};
-        } else if (value <= 65535) {
-            return new byte[]{(byte) (value >>> 8 & 255), (byte) (value & 255)};
-        } else {
-            return value <= 16777215 ? new byte[]{(byte) (value >>> 16 & 255), (byte) (value >>> 8 & 255), (byte) (value & 255)} : new byte[]{(byte) (value >>> 24 & 255), (byte) (value >>> 16 & 255), (byte) (value >>> 8 & 255), (byte) (value & 255)};
-        }
-    }
-
-    public static int byte2int(byte[] bytes) {
-        if (bytes != null && bytes.length != 0) {
-            ByteBuffer byteBuffer = ByteBuffer.allocate(4);
-
-            int i;
-            for (i = 0; i < 4 - bytes.length; ++i) {
-                byteBuffer.put((byte) 0);
-            }
-
-            for (i = 0; i < bytes.length; ++i) {
-                byteBuffer.put(bytes[i]);
-            }
-
-            byteBuffer.position(0);
-            return byteBuffer.getInt();
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * Bitwise XOR between corresponding bytes
-     *
-     * @param op1 byteArray1
-     * @param op2 byteArray2
-     * @return an array of length = the smallest between op1 and op2
-     */
-    public static byte[] xor(byte[] op1, byte[] op2) {
-        byte[] result;
-        // Use the smallest array
-        if (op2.length > op1.length) {
-            result = new byte[op1.length];
-        } else {
-            result = new byte[op2.length];
-        }
-        for (int i = 0; i < result.length; i++) {
-            result[i] = (byte) (op1[i] ^ op2[i]);
-        }
-        return result;
-    }
-
-
-    /**
-     * DES Keys use the LSB as the odd parity bit.  This method can
-     * be used enforce correct parity.
-     *
-     * @param bytes the byte array to set the odd parity on.
-     */
-    public static void adjustDESParity(byte[] bytes) {
-        for (int i = 0; i < bytes.length; i++) {
-            int b = bytes[i];
-            bytes[i] = (byte) (b & 0xfe | (b >> 1 ^ b >> 2 ^ b >> 3 ^ b >> 4 ^ b >> 5 ^ b >> 6 ^ b >> 7 ^ 0x01) & 0x01);
-        }
-    }
-
-
     /**
      * converts a BitSet into a binary field
      * used in pack routines
@@ -154,7 +85,7 @@ public class ByteArrayUtil {
         int len = bytes * 8;
         byte[] d = new byte[bytes];
         for (int i = 0; i < len; i++)
-            if (b.get(i + 1))                     // +1 because we don't use bit 0 of the BitSet
+            if (b.get(i + 1)) // +1 because we don't use bit 0 of the BitSet
                 d[i >> 3] |= 0x80 >> i % 8;
         if (len > 64)
             d[0] |= 0x80;
@@ -163,25 +94,6 @@ public class ByteArrayUtil {
         return d;
     }
 
-
-    /**
-     * Converts a binary representation of a Bitmap field
-     * into a Java BitSet.
-     * <p>
-     * The byte[] will be fully consumed, and fed into the given BitSet starting at bitOffset+1
-     *
-     * @param bmap      - BitSet
-     * @param b         - hex representation
-     * @param bitOffset - (i.e. 0 for primary bitmap, 64 for secondary)
-     * @return the same java BitSet object given as first argument
-     */
-    public static BitSet byte2BitSet(BitSet bmap, byte[] b, int bitOffset) {
-        int len = b.length << 3;
-        for (int i = 0; i < len; i++)
-            if ((b[i >> 3] & 0x80 >> i % 8) > 0)
-                bmap.set(bitOffset + i + 1);
-        return bmap;
-    }
 
     /**
      * Converts a binary representation of a Bitmap field

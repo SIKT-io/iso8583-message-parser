@@ -1,10 +1,10 @@
 package io.sikt.iso8583;
 
 import io.sikt.iso8583.packager.MessagePackager;
+import io.sikt.iso8583.packager.fields.PackagerField;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.SneakyThrows;
 
 import java.util.BitSet;
 import java.util.Map;
@@ -31,19 +31,31 @@ public class IsoMsg {
         this.packager = packager;
     }
 
-    @SneakyThrows
     public void setMTI(String mti) {
         this.setField(0, mti);
+    }
+
+    public String getMTI() {
+        return this.getField(0);
+    }
+
+    public boolean hasField(int field) {
+        return this.getField(field) != null;
     }
 
     public String getField(int field) {
         return this.fields.get(field);
     }
 
-//    @SneakyThrows
-//    public byte[] getFieldAsByteArray(int field) {
-//        return this.fields.get(field).getBytes(encoding);
-//    }
+    public byte[] getFieldAsByteArray(int field) {
+        return this.fields.get(field).getBytes(packager.getCharacterEncoding());
+    }
+
+    public void removeFields(int... fields) {
+        for (int field : fields)
+            this.fields.remove(field);
+        recalculateBitMap();
+    }
 
     public void setField(int field, String value) {
         this.fields.put(field, value);
@@ -67,7 +79,18 @@ public class IsoMsg {
         return sb.toString();
     }
 
+    @Override
+    public IsoMsg clone() {
+        IsoMsg msg = new IsoMsg();
+        msg.setMTI(this.getMTI());
+        msg.setPackager(this.packager);
+        msg.setIsoHeader(this.getIsoHeader());
+        this.fields.forEach(msg::setField);
+        return msg;
+    }
+
     private void appendFieldToSb(StringJoiner joiner, int fieldNumb, String value) {
-        joiner.add("\"" + fieldNumb + "\"" + ":\"" + value + "\"");
+        final PackagerField fieldPackager = packager.getFieldPackager(fieldNumb);
+        joiner.add("\"" + fieldNumb + "\"" + ":\"" + fieldPackager.getPadding().pad(value, fieldPackager.getLength()) + "\"");
     }
 }

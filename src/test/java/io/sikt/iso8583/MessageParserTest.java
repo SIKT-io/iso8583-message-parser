@@ -16,7 +16,7 @@ class MessageParserTest {
 
     @Test
     void networkMgmtPackagerTest_genericPackager() {
-        final String expected = "3138323002300101000000003130323431303336303030313030303131373130323431303336303038333130353130353234";
+        final String expected = "3138323002300101000008013130323431303336303030313030303131373130323431303336303038333130353130353234333451019A240F6DE12F73A92250DDE3D675B40F2E47C392DF342F862410524261D5C8DBC38CBF94D206626C";
         IsoMsg msg = new IsoMsg();
         msg.setPackager(new GenericPackager(GENERIC_PACKAGER_PATH).setEncoding(MESSAGE_ENCODING));
         msg.setMTI("1820");
@@ -26,6 +26,8 @@ class MessageParserTest {
         msg.setField(12, "171024103600");
         msg.setField(24, "831");
         msg.setField(32, "10524");
+        msg.setField(53, "51019A240F6DE12F73A92250DDE3D675B40F2E47C392DF342F862410524261D5C8DB");
+        msg.setField(64, "C38CBF94D206626C");
 
         final byte[] packed = msg.pack();
         final String hexed = ByteArrayUtil.byte2hex(packed);
@@ -84,4 +86,5 @@ class MessageParserTest {
 
         Assertions.assertEquals(ByteArrayUtil.byte2hex(expected), ByteArrayUtil.byte2hex(msg.pack()));
     }
+
 }

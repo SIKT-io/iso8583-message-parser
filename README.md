@@ -10,7 +10,7 @@
 ```xml
 <dependency>
     <groupId>io.sikt</groupId>
-    <artifactId>iso-8583</artifactId>
+    <artifactId>iso8583-message-parser</artifactId>
     <version>1.0.0</version>
 </dependency>
 ```
