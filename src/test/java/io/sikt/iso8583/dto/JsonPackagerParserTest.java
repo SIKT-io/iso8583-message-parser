@@ -12,6 +12,5 @@ class JsonPackagerParserTest {
         Assertions.assertNotNull(configuration);
         Assertions.assertNotNull(configuration.getPackagerInfo());
         Assertions.assertNotNull(configuration.getMessageTypeParserGuide());
-        System.out.println(configuration);
     }
 }

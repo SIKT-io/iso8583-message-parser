@@ -1,11 +1,12 @@
 {
+  "messageEncoding": "ASCII",
   "messageTypes": {
     "1820": [0,7,11,12,24,25,32,53,64]
   },
   "packager": {
     "fields": [
       {"field": 0, "type": "NUMERIC", "length": 4, "description": "Message Type Indicator"},
-      {"field": 1, "type": "ALPHA", "length": 16, "description": "Bitmap"},
+      {"field": 1, "type": "BINARY", "length": 8, "description": "Bitmap"},
       {"field": 2, "type": "LL_VAR", "length": 19, "description": "Primary Account number"},
       {"field": 3, "type": "NUMERIC", "length": 6, "description": "Processing Code"},
       {"field": 4, "type": "NUMERIC", "length": 12, "description": "Amount, Transaction"},

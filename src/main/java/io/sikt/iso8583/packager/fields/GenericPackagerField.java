@@ -6,6 +6,7 @@ import io.sikt.iso8583.util.ByteArrayUtil;
 import lombok.SneakyThrows;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.Charset;
 
 public abstract class GenericPackagerField implements PackagerField {
 
@@ -24,19 +25,13 @@ public abstract class GenericPackagerField implements PackagerField {
     @SneakyThrows
     public byte[] pack(String what, String charset) {
 
-        final boolean isBinary = FieldType.isBinaryType(type);
-
-        if (isBinary) {
-            what = ByteArrayUtil.byte2hex(what.getBytes(charset));
-        }
-
         final String padded = padding.pad(what, length);
-
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
-        final byte[] paddedRaw = padded.getBytes(charset);
+        final boolean isBinary = FieldType.isBinaryType(type);
+        final byte[] paddedRaw = isBinary ? ByteArrayUtil.hex2byte(what, Charset.forName(charset)) : padded.getBytes(charset);
         if (FieldType.isVariableLength(type)) {
-            writeLengthHeader(bout, isBinary ? paddedRaw.length * 2 : paddedRaw.length, type);
+            writeLengthHeader(bout, isBinary ? paddedRaw.length * 2 : paddedRaw.length);
         }
 
         bout.write(paddedRaw);
@@ -46,28 +41,27 @@ public abstract class GenericPackagerField implements PackagerField {
 
     @SneakyThrows
     public String unpack(byte[] what, String charset) {
-        final String padded = new String(what, charset);
+
+        final boolean isBinary = FieldType.isBinaryType(type);
+
+        if (isBinary) {
+            what = ByteArrayUtil.byte2hex(what).getBytes(charset);
+        }
+
+        String padded = new String(what, charset);
+
         return padding.unpad(padded);
     }
 
-    private void writeLengthHeader(ByteArrayOutputStream bout, int length, FieldType type) {
+    private void writeLengthHeader(ByteArrayOutputStream bout, int length) {
 
         if (!FieldType.isVariableLength(type))
             return;
 
-        final int digits;
-        if (type == FieldType.LLLLBIN || type == FieldType.LLLLVAR) {
-            digits = 4;
-        } else if (type == FieldType.LLLBIN || type == FieldType.LLLVAR) {
-            digits = 3;
-        } else {
-            digits = 2;
-        }
-
-        if (digits == 4) {
+        if (type.getNumberOfLengthDigits() == 4) {
             bout.write((length / 1000) + 48);
             bout.write(((length % 1000) / 100) + 48);
-        } else if (digits == 3) {
+        } else if (type.getNumberOfLengthDigits() == 3) {
             bout.write((length / 100) + 48);
         }
         if (length >= 10) {

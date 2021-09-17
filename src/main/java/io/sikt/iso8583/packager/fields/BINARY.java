@@ -2,7 +2,6 @@ package io.sikt.iso8583.packager.fields;
 
 import io.sikt.iso8583.FieldType;
 import io.sikt.iso8583.packager.padder.NullPadder;
-import io.sikt.iso8583.packager.padder.ZeroLeftPadder;
 
 public class BINARY extends GenericPackagerField {
 

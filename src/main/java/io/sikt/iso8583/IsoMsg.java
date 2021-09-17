@@ -8,6 +8,7 @@ import lombok.SneakyThrows;
 
 import java.util.BitSet;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.TreeMap;
 
 @NoArgsConstructor
@@ -15,13 +16,6 @@ public class IsoMsg {
 
     @Setter
     private MessagePackager packager;
-
-    @Getter
-    private String encoding = System.getProperty("file.encoding");
-    @Getter
-    @Setter
-    private boolean binBitmap;
-    private int etx = -1;
 
     @Setter
     @Getter
@@ -46,10 +40,10 @@ public class IsoMsg {
         return this.fields.get(field);
     }
 
-    @SneakyThrows
-    public byte[] getFieldAsByteArray(int field) {
-        return this.fields.get(field).getBytes(encoding);
-    }
+//    @SneakyThrows
+//    public byte[] getFieldAsByteArray(int field) {
+//        return this.fields.get(field).getBytes(encoding);
+//    }
 
     public void setField(int field, String value) {
         this.fields.put(field, value);
@@ -65,5 +59,15 @@ public class IsoMsg {
 
     public byte[] pack() {
         return packager.pack(this);
+    }
+
+    public String dumpMsgAsJson() {
+        StringJoiner sb = new StringJoiner(",", "{", "}");
+        fields.forEach((key, value) -> appendFieldToSb(sb, key, value));
+        return sb.toString();
+    }
+
+    private void appendFieldToSb(StringJoiner joiner, int fieldNumb, String value) {
+        joiner.add("\"" + fieldNumb + "\"" + ":\"" + value + "\"");
     }
 }

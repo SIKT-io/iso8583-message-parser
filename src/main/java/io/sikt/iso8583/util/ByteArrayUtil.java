@@ -150,9 +150,9 @@ public class ByteArrayUtil {
      * @param b - the BitSet
      * @return binary representation
      */
-    public static byte[] bitSet2byte(BitSet b) {
-        int len = b.length() + 62 >> 6 << 6;        // +62 because we don't use bit 0 in the BitSet
-        byte[] d = new byte[len >> 3];
+    public static byte[] bitSet2byte(BitSet b, int bytes) {
+        int len = bytes * 8;
+        byte[] d = new byte[bytes];
         for (int i = 0; i < len; i++)
             if (b.get(i + 1))                     // +1 because we don't use bit 0 of the BitSet
                 d[i >> 3] |= 0x80 >> i % 8;
@@ -161,5 +161,49 @@ public class ByteArrayUtil {
         if (len > 128)
             d[8] |= 0x80;
         return d;
+    }
+
+
+    /**
+     * Converts a binary representation of a Bitmap field
+     * into a Java BitSet.
+     * <p>
+     * The byte[] will be fully consumed, and fed into the given BitSet starting at bitOffset+1
+     *
+     * @param bmap      - BitSet
+     * @param b         - hex representation
+     * @param bitOffset - (i.e. 0 for primary bitmap, 64 for secondary)
+     * @return the same java BitSet object given as first argument
+     */
+    public static BitSet byte2BitSet(BitSet bmap, byte[] b, int bitOffset) {
+        int len = b.length << 3;
+        for (int i = 0; i < len; i++)
+            if ((b[i >> 3] & 0x80 >> i % 8) > 0)
+                bmap.set(bitOffset + i + 1);
+        return bmap;
+    }
+
+    /**
+     * Converts a binary representation of a Bitmap field
+     * into a Java BitSet
+     *
+     * @param b       - binary representation
+     * @param offset  - staring offset
+     * @param maxBits - max number of bits (supports 64,128 or 192)
+     * @return java BitSet object
+     */
+    public static BitSet byte2BitSet(byte[] b, int offset, int maxBits) {
+        boolean b1 = (b[offset] & 0x80) == 0x80;
+        boolean b65 = (b.length > offset + 8) && ((b[offset + 8] & 0x80) == 0x80);
+
+        int len = (maxBits > 128 && b1 && b65) ? 192 :
+            (maxBits > 64 && b1) ? 128 :
+                (maxBits < 64) ? maxBits : 64;
+
+        BitSet bmap = new BitSet(len);
+        for (int i = 0; i < len; i++)
+            if ((b[offset + (i >> 3)] & 0x80 >> i % 8) > 0)
+                bmap.set(i + 1);
+        return bmap;
     }
 }

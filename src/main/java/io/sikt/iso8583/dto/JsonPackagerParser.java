@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,9 +35,11 @@ public class JsonPackagerParser {
             final JsonReader reader = JsonReader.from(stream);
             reader.object();
             reader.next();
-            readJsonElement(configuration, reader);
+            readJsonElement(configuration, reader); // messageEncoding
             reader.next();
-            readJsonElement(configuration, reader);
+            readJsonElement(configuration, reader); // messageTypes
+            reader.next();
+            readJsonElement(configuration, reader); // packager
 
             if (log.isTraceEnabled())
                 log.trace("imported PackagerConfiguration: {}", configuration);
@@ -50,6 +53,9 @@ public class JsonPackagerParser {
 
     private static void readJsonElement(PackagerConfiguration configuration, JsonReader reader) throws JsonParserException {
         switch (reader.key()) {
+            case "messageEncoding":
+                configuration.setEncoding(readMessageEncoding(reader));
+                break;
             case "messageTypes":
                 configuration.setMessageTypeParserGuide(readFieldParseGuide(reader));
                 break;
@@ -66,6 +72,10 @@ public class JsonPackagerParser {
 
         final List<JsonPackagerField> fields = getFields(reader);
         return fields.stream().collect(Collectors.toMap(JsonPackagerField::getField, JsonPackagerField::convertToPackagerField));
+    }
+
+    private static Charset readMessageEncoding(JsonReader reader) throws JsonParserException {
+        return Charset.forName(reader.string());
     }
 
     private static Map<String, List<Integer>> readFieldParseGuide(JsonReader reader) throws JsonParserException {
