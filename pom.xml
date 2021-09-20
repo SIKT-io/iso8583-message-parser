@@ -7,6 +7,25 @@
     <groupId>io.sikt</groupId>
     <artifactId>iso8583-message-parser</artifactId>
     <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <description>A super-lightweight framework for working with iso-8583 messages in Java</description>
+    <name>iso8583-message-parser</name>
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://github.com/SIKT-io/iso8583-message-parser/blob/master/LICENSE</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>André Stenersen</name>
+            <email>andr3@duck.com</email>
+            <organization>SIKT</organization>
+            <organizationUrl>https://www.sikt.io</organizationUrl>
+        </developer>
+    </developers>
 
     <properties>
         <lombok.version>1.18.20</lombok.version>
@@ -21,7 +40,15 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
     </properties>
+
+    <scm>
+        <connection>scm:git:git@github.com:SIKT-io/iso8583-message-parser.git</connection>
+        <developerConnection>scm:git:git@github.com:SIKT-io/iso8583-message-parser.git</developerConnection>
+        <url>https://github.com/SIKT-io/iso8583-message-parser</url>
+    </scm>
 
     <dependencies>
         <dependency>
@@ -85,6 +112,34 @@
                         <phase>test</phase>
                         <goals>
                             <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Attach source jars-->
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-source</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Attach javadocs jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>

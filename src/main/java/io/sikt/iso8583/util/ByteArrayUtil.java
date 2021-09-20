@@ -76,14 +76,15 @@ public class ByteArrayUtil {
      * used in pack routines
      * <p>
      * This method will set bits 0 (and 65) if there's a secondary (and tertiary) bitmap
-     * (i.e., if the bitmap length is > 64 (and > 128))
+     * (i.e., if the bitmap length is grater than 64 (and grater than 128))
      *
      * @param b - the BitSet
+     * @param length - length
      * @return binary representation
      */
-    public static byte[] bitSet2byte(BitSet b, int bytes) {
-        int len = bytes * 8;
-        byte[] d = new byte[bytes];
+    public static byte[] bitSet2byte(BitSet b, int length) {
+        int len = length * 8;
+        byte[] d = new byte[length];
         for (int i = 0; i < len; i++)
             if (b.get(i + 1)) // +1 because we don't use bit 0 of the BitSet
                 d[i >> 3] |= 0x80 >> i % 8;
@@ -107,15 +108,18 @@ public class ByteArrayUtil {
     public static BitSet byte2BitSet(byte[] b, int offset, int maxBits) {
         boolean b1 = (b[offset] & 0x80) == 0x80;
         boolean b65 = (b.length > offset + 8) && ((b[offset + 8] & 0x80) == 0x80);
-
-        int len = (maxBits > 128 && b1 && b65) ? 192 :
-            (maxBits > 64 && b1) ? 128 :
-                (maxBits < 64) ? maxBits : 64;
+        int len = getLength(maxBits, b1, b65);
 
         BitSet bmap = new BitSet(len);
         for (int i = 0; i < len; i++)
             if ((b[offset + (i >> 3)] & 0x80 >> i % 8) > 0)
                 bmap.set(i + 1);
         return bmap;
+    }
+
+    private static int getLength(int maxBits, boolean b1, boolean b65) {
+        if (maxBits > 128 && b1 && b65) return 192;
+        else if (maxBits > 64 && b1) return 128;
+        else return Math.min(maxBits, 64);
     }
 }
