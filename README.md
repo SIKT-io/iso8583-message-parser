@@ -1,7 +1,7 @@
 ![Coverage](.github/badges/jacoco.svg)
 ![Branches](.github/badges/branches.svg)
 
-# ISO-8583
+# Iso8583 message parser
 
 > A super-lightweight framework for working with iso-8583 messages in Java
 
