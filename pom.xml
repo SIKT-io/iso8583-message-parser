@@ -11,6 +11,8 @@
 
     <description>A super-lightweight framework for working with iso-8583 messages in Java</description>
     <name>iso8583-message-parser</name>
+    <url>https://github.com/SIKT-io/iso8583-message-parser</url>
+
     <licenses>
         <license>
             <name>MIT License</name>
