@@ -11,7 +11,7 @@
 <dependency>
     <groupId>io.sikt</groupId>
     <artifactId>iso8583-message-parser</artifactId>
-    <version>1.0.0</version>
+    <version>0.1.0</version>
 </dependency>
 ```
 
