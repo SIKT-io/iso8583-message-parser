@@ -15,6 +15,7 @@ import java.util.TreeMap;
 public class IsoMsg {
 
     @Setter
+    @Getter
     private MessagePackager packager;
 
     @Setter
@@ -44,7 +45,16 @@ public class IsoMsg {
     }
 
     public String getField(int field) {
-        return this.fields.get(field);
+        final String what = this.fields.get(field);
+
+        // Pad numeric values
+        if (what != null && what.length() == 0) {
+            PackagerField fieldPackager = this.packager.getFieldPackager(field);
+            if (fieldPackager != null && FieldType.NUMERIC.equals(fieldPackager.getType())) {
+                return pad(fieldPackager, what);
+            }
+        }
+        return what;
     }
 
     public byte[] getFieldAsByteArray(int field) {
@@ -58,7 +68,10 @@ public class IsoMsg {
     }
 
     public void setField(int field, String value) {
-        this.fields.put(field, value);
+        if (value != null)
+            this.fields.put(field, value);
+        else
+            this.fields.remove(field);
         recalculateBitMap();
     }
 
@@ -73,10 +86,21 @@ public class IsoMsg {
         return packager.pack(this);
     }
 
-    public String dumpMsgAsJson() {
+    /**
+     * Print IsoMsg as a Json-string
+     *
+     * @param paramsToMask Optional list of values that wil be masked with ***'s
+     * @return
+     */
+    public String dumpMsgAsJson(String... paramsToMask) {
         StringJoiner sb = new StringJoiner(",", "{", "}");
         fields.forEach((key, value) -> appendFieldToSb(sb, key, value));
-        return sb.toString();
+
+        String json = sb.toString();
+        if (paramsToMask != null)
+            for (String mask : paramsToMask)
+                json = mask(mask, json);
+        return json;
     }
 
     @Override
@@ -90,7 +114,28 @@ public class IsoMsg {
     }
 
     private void appendFieldToSb(StringJoiner joiner, int fieldNumb, String value) {
-        final PackagerField fieldPackager = packager.getFieldPackager(fieldNumb);
-        joiner.add("\"" + fieldNumb + "\"" + ":\"" + fieldPackager.getPadding().pad(value, fieldPackager.getLength()) + "\"");
+        joiner.add("\"" + fieldNumb + "\"" + ":\"" + pad(packager.getFieldPackager(fieldNumb), value) + "\"");
     }
+
+    private String pad(PackagerField packager, String value) {
+        return packager.getPadding().pad(value, packager.getLength());
+    }
+
+    private String mask(String what, String where) {
+        if (what.length() == 19) // probably a PAN
+            return where.replace(what, what.substring(0, 6) + getMasking(9) + what.substring(15));
+
+        return where.replace(what, getMasking(what.length()));
+
+    }
+
+    private String getMasking(int length) {
+        final char maskingChar = '*';
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append(maskingChar);
+        }
+        return sb.toString();
+    }
+
 }

@@ -78,7 +78,7 @@ public abstract class BasePackager implements MessagePackager {
 
         final String mti = msg.getField(MTI_FIELD);
         if (mti == null)
-            throw new IsoException("Unable to determine field parsing because field 0 is not set. ");
+            log.debug("Unable to determine field parsing because field 0 (MTI) is not set.");
 
         final Map<Integer, PackagerField> fieldParserGuide = getFieldsParserGuide(mti);
         validatePackagerField(mti, fieldParserGuide, MTI_FIELD);
