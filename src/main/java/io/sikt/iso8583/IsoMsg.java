@@ -89,18 +89,13 @@ public class IsoMsg {
     /**
      * Print IsoMsg as a Json-string
      *
-     * @param paramsToMask Optional list of values that wil be masked with ***'s
-     * @return
+     * @return iso-message in json format.
      */
-    public String dumpMsgAsJson(String... paramsToMask) {
+    public String dumpMsgAsJson() {
         StringJoiner sb = new StringJoiner(",", "{", "}");
         fields.forEach((key, value) -> appendFieldToSb(sb, key, value));
 
-        String json = sb.toString();
-        if (paramsToMask != null)
-            for (String mask : paramsToMask)
-                json = mask(mask, json);
-        return json;
+        return sb.toString();
     }
 
     @Override
@@ -121,21 +116,5 @@ public class IsoMsg {
         return packager.getPadding().pad(value, packager.getLength());
     }
 
-    private String mask(String what, String where) {
-        if (what.length() == 19) // probably a PAN
-            return where.replace(what, what.substring(0, 6) + getMasking(9) + what.substring(15));
-
-        return where.replace(what, getMasking(what.length()));
-
-    }
-
-    private String getMasking(int length) {
-        final char maskingChar = '*';
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            sb.append(maskingChar);
-        }
-        return sb.toString();
-    }
 
 }

@@ -33,6 +33,10 @@ public abstract class BasePackager implements MessagePackager {
         this.encoding = packagerConfiguration.getEncoding();
     }
 
+    public void setPackagerField(int field, PackagerField value) {
+        this.packagerInfo.put(field, value);
+    }
+
     @Override
     public Charset getCharacterEncoding() {
         return this.encoding;
