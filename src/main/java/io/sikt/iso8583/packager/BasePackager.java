@@ -58,10 +58,14 @@ public abstract class BasePackager implements MessagePackager {
         AtomicInteger readOffset = new AtomicInteger(0);
 
         final String mti = readPackagerField(data, readOffset, packagerInfo.get(MTI_FIELD));
-        msg.setMTI(mti);
+        if (mti != null && !"".equals(mti.trim()))
+            msg.setMTI(mti);
 
         final BitSet bMap = readBitMap(data, readOffset, packagerInfo.get(PRIMARY_BITMAP_FIELD));
-        log.debug("Unpacking mti: {}, bitmap: {}", mti, bMap);
+        if (msg.hasField(MTI_FIELD))
+            log.debug("Unpacking mti: {}, bitmap: {}", mti, bMap);
+        else
+            log.debug("Unpacking msg with bitmap: {}", bMap);
 
         final Map<Integer, PackagerField> fieldParserGuide = getFieldsParserGuide(mti);
         validatePackagerField(mti, fieldParserGuide, MTI_FIELD);
@@ -123,7 +127,7 @@ public abstract class BasePackager implements MessagePackager {
 
     @SneakyThrows
     private void printToBuffer(IsoMsg msg, ByteArrayOutputStream bout, PackagerField packagerField, int field) {
-        if (packagerField == null || !msg.hasField(field)) return;
+        if (packagerField == null || !msg.hasField(field) || packagerField.getLength() <= 0) return;
         bout.write(packagerField.pack(msg.getField(field), encoding));
     }
 
