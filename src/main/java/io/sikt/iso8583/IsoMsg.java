@@ -47,10 +47,13 @@ public class IsoMsg {
     public String getField(int field) {
         final String what = this.fields.get(field);
 
-        // Pad numeric values
-        if (what != null && what.length() == 0) {
+        if (what != null) {
             PackagerField fieldPackager = this.packager.getFieldPackager(field);
-            if (fieldPackager != null && FieldType.NUMERIC.equals(fieldPackager.getType())) {
+            if (fieldPackager == null)
+                return what;
+
+            // Pad numeric values
+            if (FieldType.NUMERIC.equals(fieldPackager.getType()) && what.length() < fieldPackager.getLength()) {
                 return pad(fieldPackager, what);
             }
         }

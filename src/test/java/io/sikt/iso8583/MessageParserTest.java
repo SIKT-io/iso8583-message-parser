@@ -62,7 +62,7 @@ class MessageParserTest {
         IsoMsg msg = new DummyPackager(MESSAGE_ENCODING).unpack(expected);
 
         Assertions.assertEquals("1024103600", msg.getField(7));
-        Assertions.assertEquals("10001", msg.getField(11));
+        Assertions.assertEquals("010001", msg.getField(11));
         Assertions.assertEquals("171024103600", msg.getField(12));
         Assertions.assertEquals("831", msg.getField(24));
         Assertions.assertEquals("10524", msg.getField(32));
@@ -79,7 +79,7 @@ class MessageParserTest {
             .unpack(expected);
 
         Assertions.assertEquals("1024103600", msg.getField(7));
-        Assertions.assertEquals("10001", msg.getField(11));
+        Assertions.assertEquals("010001", msg.getField(11));
         Assertions.assertEquals("171024103600", msg.getField(12));
         Assertions.assertEquals("831", msg.getField(24));
         Assertions.assertEquals("10524", msg.getField(32));
