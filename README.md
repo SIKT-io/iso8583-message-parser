@@ -11,12 +11,15 @@
 <dependency>
     <groupId>io.sikt</groupId>
     <artifactId>iso8583-message-parser</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.3</version>
 </dependency>
 ```
 
 ### Packager
-Example (json) packager can be found in [IFSF-ASCII-1993.json](./src/main/resources/packagers/IFSF-ASCII-1993.json)
+
+Example packagers:  
+Json-based packager can be found in [IFSF-ASCII-1993.json](./src/main/resources/packagers/IFSF-ASCII-1993.json)  
+Java-based packager can be found in [P48Packager.java](src/test/java/io/sikt/iso8583/packager/P48Packager.java)  
 
 Alternatively you can create your own Java packager like this:
 
