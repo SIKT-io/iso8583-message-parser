@@ -63,9 +63,9 @@ public abstract class BasePackager implements MessagePackager {
 
         final BitSet bMap = readBitMap(data, readOffset, packagerInfo.get(PRIMARY_BITMAP_FIELD));
         if (msg.hasField(MTI_FIELD))
-            log.debug("Unpacking mti: {}, bitmap: {}", mti, bMap);
+            log.debug("Unpacking msg (packager: {}) with mti: {}, bitmap: {}", this.getClass().getSimpleName(), mti, bMap);
         else
-            log.debug("Unpacking msg with bitmap: {}", bMap);
+            log.debug("Unpacking msg (packager: {}) with bitmap: {}", this.getClass().getSimpleName(), bMap);
 
         final Map<Integer, PackagerField> fieldParserGuide = getFieldsParserGuide(mti);
         validatePackagerField(mti, fieldParserGuide, MTI_FIELD);
@@ -85,8 +85,6 @@ public abstract class BasePackager implements MessagePackager {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
         final String mti = msg.getField(MTI_FIELD);
-        if (mti == null)
-            log.debug("Unable to determine field parsing because field 0 (MTI) is not set.");
 
         final Map<Integer, PackagerField> fieldParserGuide = getFieldsParserGuide(mti);
         validatePackagerField(mti, fieldParserGuide, MTI_FIELD);
@@ -111,6 +109,8 @@ public abstract class BasePackager implements MessagePackager {
     }
 
     private Map<Integer, PackagerField> getFieldsParserGuide(String mti) {
+        if(mti == null)
+            return packagerInfo;
         final List<Integer> expectedFields = messageTypeParserGuide.get(mti);
         if (expectedFields == null || expectedFields.isEmpty())
             return packagerInfo;
