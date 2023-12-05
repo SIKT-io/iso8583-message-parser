@@ -33,7 +33,7 @@
         <lombok.version>1.18.20</lombok.version>
         <slf4j-api.version>1.7.32</slf4j-api.version>
         <nanojson.version>1.7</nanojson.version>
-        <logback.version>1.2.6</logback.version>
+        <logback.version>1.2.13</logback.version>
         <junit-jupiter.version>5.8.0</junit-jupiter.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
